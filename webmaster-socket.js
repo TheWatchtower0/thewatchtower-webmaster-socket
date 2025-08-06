@@ -162,6 +162,8 @@ webSocketSecure.on("connection", async (webSocket, request) => {
             deviceId: webSocket.deviceId,
           };
 
+           console.log(payload)
+
           const members = await getConversationMembers(json.conversation_id);
 
           if (!members) return;
@@ -250,6 +252,7 @@ webSocketSecure.on("connection", async (webSocket, request) => {
 });
 
 async function getConversationMembers(conversation_id) {
+   console.log(conversation_id)
   if (conversationsMap.has(conversation_id)) {
     return conversationsMap.get(conversation_id);
   } else {
@@ -277,3 +280,4 @@ async function getConversationMembers(conversation_id) {
 }
 
 console.log('Webmaster socket server is running')
+
