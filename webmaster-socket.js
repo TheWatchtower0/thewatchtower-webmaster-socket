@@ -5,7 +5,7 @@ const webSocketSecure = new WebSocketServer({
    port: process.env.PORT || 8080
 });
 
-const BACKEND_URL = "https://watchtower.thewatchtower.ae/api/v1";
+const BACKEND_URL = "https://watchtower.thewatchtower.ae/api";
 
 /**
  * @type {Map<string, WebSocket>}
@@ -162,8 +162,6 @@ webSocketSecure.on("connection", async (webSocket, request) => {
             deviceId: webSocket.deviceId,
           };
 
-           console.log(payload)
-
           const members = await getConversationMembers(json.conversation_id);
 
           if (!members) return;
@@ -252,7 +250,6 @@ webSocketSecure.on("connection", async (webSocket, request) => {
 });
 
 async function getConversationMembers(conversation_id) {
-   console.log(conversation_id)
   if (conversationsMap.has(conversation_id)) {
     return conversationsMap.get(conversation_id);
   } else {
@@ -280,4 +277,5 @@ async function getConversationMembers(conversation_id) {
 }
 
 console.log('Webmaster socket server is running')
+
 
