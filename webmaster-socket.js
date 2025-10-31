@@ -65,8 +65,6 @@ webSocketSecure.on("connection", async (webSocket, request) => {
             },
           });
 
-           console.log(await response.clone().text())
-
           const data = await response.json();
 
           const involvedSockets = [
@@ -279,6 +277,7 @@ async function getConversationMembers(conversation_id) {
 }
 
 console.log('Webmaster socket server is running')
+
 
 
 
