@@ -5,7 +5,7 @@ const webSocketSecure = new WebSocketServer({
    port: process.env.PORT || 8080
 });
 
-const BACKEND_URL = "https://thewatchtower.com/api";
+const BACKEND_URL = "https://www.thewatchtower.com/api";
 
 /**
  * @type {Map<string, WebSocket>}
@@ -279,6 +279,7 @@ async function getConversationMembers(conversation_id) {
 }
 
 console.log('Webmaster socket server is running')
+
 
 
 
