@@ -5,7 +5,7 @@ const webSocketSecure = new WebSocketServer({
    port: process.env.PORT || 8080
 });
 
-const BACKEND_URL = process.env.PORT || "https://watchtower.thewatchtower.ae/api";
+const BACKEND_URL = process.env.BACKEND_URL || "https://watchtower.thewatchtower.ae/api";
 
 **
  * @type {Map<string, Set<WebSocket>>} - userId to set of WebSocket connections
@@ -483,3 +483,4 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on port ${process.env.PORT || 8080}`);
+
