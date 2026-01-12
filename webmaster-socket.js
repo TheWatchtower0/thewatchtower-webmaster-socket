@@ -459,7 +459,7 @@ function createApi(ws) {
     async get(url, params = {}) {
       const queryString = new URLSearchParams(params).toString();
       const urlWithParams = queryString ? `${url}?${queryString}` : url;
-console.log(ws.token, url)
+console.log(ws.token, url);
       return await fetch(`${BACKEND_URL}${urlWithParams}`, {
         method: "GET",
         headers: {
@@ -482,6 +482,7 @@ console.log(ws.token, url)
 }
 
 console.log(`WebSocket server is running on port ${process.env.PORT || 8080}`);
+
 
 
 
