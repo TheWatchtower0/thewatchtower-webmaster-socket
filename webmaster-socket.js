@@ -429,7 +429,7 @@ function createGetMembers(ws) {
       );
 
       const data = await response.json();
-
+console.log(conversation_id, data);
       const payload = {
         conversation_user_id: data.data.conversation_user_id.toString(),
         conversation_admin_id: data.data.conversation_admin_id.toString(),
@@ -483,5 +483,6 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on port ${process.env.PORT || 8080}`);
+
 
 
