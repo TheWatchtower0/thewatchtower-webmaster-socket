@@ -424,24 +424,38 @@ function createGetMembers(ws) {
     if (conversationsMap.has(conversation_id)) {
       return conversationsMap.get(conversation_id);
     } else {
-      const response = await api.get(
-        `/messages/conversation/${conversation_id}`
-      );
-
-      const data = await response.json();
-
-       if(data.status){
-      const payload = {
-        conversation_user_id: data.data.conversation_user_id.toString(),
-        conversation_admin_id: data.data.conversation_admin_id.toString(),
-      };
-
-      conversationsMap.set(conversation_id, payload);
-
-      return payload;
-       } else{
-          console.error(data)
-       }
+       try {
+        const response = await api.get(`/messages/conversation/${conversation_id}`);
+        
+        // 1. Check if the response is actually JSON
+        const contentType = response.headers.get("content-type");
+        
+        if (contentType && contentType.includes("application/json")) {
+          const data = await response.json();
+          
+          if (data.status) {
+            const payload = {
+              conversation_user_id: String(data.data?.conversation_user_id),
+              conversation_admin_id: String(data.data?.conversation_admin_id),
+            };
+            conversationsMap.set(conversation_id, payload);
+            return payload;
+          }
+        } else {
+          // 2. Handle HTML or plain text response
+          const textError = await response.text();
+          console.warn("Received non-JSON response:", textError);
+          throw new Error(`Server returned ${response.status} (HTML/Text)`);
+        }
+      
+      } catch (error) {
+        // 3. Robust Error Logging
+        if (error instanceof SyntaxError) {
+          console.error("JSON Parsing failed. The server likely sent HTML.");
+        } else {
+          console.error("Request Error:", error.message);
+        }
+      }
     }
   };
 }
@@ -486,6 +500,7 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on port ${process.env.PORT || 8080}`);
+
 
 
 
