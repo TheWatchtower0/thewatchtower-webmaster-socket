@@ -209,6 +209,7 @@ async function handleSendMessage(json, webSocket, getChatMembers, api) {
   });
 
   const members = await getChatMembers(json.conversation_id);
+   console.log(members, json.conversation_id, webSocket.userId);
   if (!members) return;
 
   // Send to all connections of the user (all their devices)
@@ -216,6 +217,7 @@ async function handleSendMessage(json, webSocket, getChatMembers, api) {
     webSocket.userId,
   ]);
 
+  
   // Send to all connections of the admin (all admin devices)
   sendToUserConnections(members.conversation_admin_id, payload, [
     webSocket.userId,
@@ -500,6 +502,7 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on port ${process.env.PORT || 8080}`);
+
 
 
 
