@@ -2,10 +2,11 @@ import url from "url";
 import { WebSocketServer } from "ws";
 
 const webSocketSecure = new WebSocketServer({
-   port: process.env.PORT || 8080
+  port: process.env.PORT || 8080,
 });
 
-const BACKEND_URL = process.env.BACKEND_URL || "https://watchtower.thewatchtower.ae/api";
+const BACKEND_URL =
+  process.env.BACKEND_URL || "https://watchtower.thewatchtower.ae/api";
 
 /**
  * @type {Map<string, Set<WebSocket>>} - userId to set of WebSocket connections
@@ -49,7 +50,7 @@ webSocketSecure.on("connection", async (webSocket, request) => {
   webSocket.conversationId = conversationId;
   webSocket.isAlive = true;
 
- // Add to device connections
+  // Add to device connections
   if (!deviceConnections.has(deviceId)) {
     deviceConnections.set(deviceId, new Set());
   }
@@ -62,7 +63,7 @@ webSocketSecure.on("connection", async (webSocket, request) => {
       adminConnections.set(userId, new Set());
     }
     adminConnections.get(userId).add(webSocket);
-    
+
     // Also track admins in userConnections for easy lookup when sending messages
     if (!userConnections.has(userId)) {
       userConnections.set(userId, new Set());
@@ -209,24 +210,13 @@ async function handleSendMessage(json, webSocket, getChatMembers, api) {
   });
 
   const members = await getChatMembers(json.conversation_id);
-   console.log(members, json.conversation_id, webSocket.userId);
   if (!members) return;
 
   // Send to all connections of the user (all their devices)
-  sendToUserConnections(members.conversation_user_id, payload, [
-    webSocket.userId,
-  ]);
+  sendToUserConnections(members.conversation_user_id, payload);
 
-  
   // Send to all connections of the admin (all admin devices)
-  sendToUserConnections(members.conversation_admin_id, payload, [
-    webSocket.userId,
-  ]);
-
-  // If sender is admin, also broadcast to all other admins
-  if (webSocket.isAdmin) {
-    broadcastToAllAdmins(payload, [webSocket.userId]);
-  }
+  broadcastToAllAdmins(payload);
 }
 
 async function handleDeliveredMessage(json, webSocket, getChatMembers, api) {
@@ -426,15 +416,17 @@ function createGetMembers(ws) {
     if (conversationsMap.has(conversation_id)) {
       return conversationsMap.get(conversation_id);
     } else {
-       try {
-        const response = await api.get(`/messages/conversation/${conversation_id}`);
-        
+      try {
+        const response = await api.get(
+          `/messages/conversation/${conversation_id}`
+        );
+
         // 1. Check if the response is actually JSON
         const contentType = response.headers.get("content-type");
-        
+
         if (contentType && contentType.includes("application/json")) {
           const data = await response.json();
-          
+
           if (data.status) {
             const payload = {
               conversation_user_id: String(data.data?.conversation_user_id),
@@ -449,7 +441,6 @@ function createGetMembers(ws) {
           console.warn("Received non-JSON response:", textError);
           throw new Error(`Server returned ${response.status} (HTML/Text)`);
         }
-      
       } catch (error) {
         // 3. Robust Error Logging
         if (error instanceof SyntaxError) {
@@ -502,12 +493,3 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on port ${process.env.PORT || 8080}`);
-
-
-
-
-
-
-
-
-
