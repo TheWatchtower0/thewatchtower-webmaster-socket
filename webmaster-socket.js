@@ -1,12 +1,12 @@
 import url from "url";
 import { WebSocketServer } from "ws";
 
+const port = process.env.PORT || 8080;
 const webSocketSecure = new WebSocketServer({
-  port: process.env.PORT || 8080,
+  port,
 });
 
-const BACKEND_URL =
-  process.env.BACKEND_URL || "https://watchtower.thewatchtower.ae/api";
+const BACKEND_URL = process.env.BACKEND_URL;
 
 /**
  * @type {Map<string, Set<WebSocket>>} - userId to set of WebSocket connections
@@ -181,6 +181,10 @@ async function handleMessage(json, webSocket, getChatMembers, api) {
       await handleAdminOpenChat(json, webSocket, getChatMembers, api);
       break;
 
+    case "ping":
+      webSocket.send(JSON.stringify({ type: "pong" }));
+      break;
+
     default:
       console.log("Unknown message type:", json.type);
       break;
@@ -330,10 +334,13 @@ async function handleAdminOpenChat(json, webSocket, getChatMembers, api) {
     deviceId: webSocket.deviceId,
   };
 
-  await api.post("/messages/read-all", {
+  const response = await api.post("/messages/read-all", {
     sender_id: webSocket.userId,
     conversation_id: payload.conversation_id,
   });
+
+  const data = await response.json()
+  console.log(webSocket.token, BACKEND_URL, data)
 
   const members = await getChatMembers(json.conversation_id);
   if (!members) return;
@@ -492,4 +499,4 @@ function createApi(ws) {
   };
 }
 
-console.log(`WebSocket server is running on port ${process.env.PORT || 8080}`);
+console.log(`WebSocket server is running on ${port}, backend url: ${BACKEND_URL}`);
