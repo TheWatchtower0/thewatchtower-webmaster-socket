@@ -36,6 +36,7 @@ webSocketSecure.on("connection", async (webSocket, request) => {
     conversationId,
     token,
     userOnWebmaster = "1",
+    userAgent
   } = url.parse(request.url, true).query;
 
   const parsedIsAdmin = isAdmin === "true";
@@ -49,6 +50,7 @@ webSocketSecure.on("connection", async (webSocket, request) => {
   webSocket.userOnWebmaster = parsedUserOnWebmaster;
   webSocket.conversationId = conversationId;
   webSocket.isAlive = true;
+  webSocket.userAgent = userAgent;
 
   // Add to device connections
   if (!deviceConnections.has(deviceId)) {
@@ -483,6 +485,7 @@ function createApi(ws) {
         headers: {
           "Content-type": "application/json",
           Authorization: `Bearer ${ws.token}`,
+          'User-Agent': ws.userAgent,
         },
       });
     },
@@ -493,6 +496,7 @@ function createApi(ws) {
         headers: {
           "Content-type": "application/json",
           Authorization: `Bearer ${ws.token}`,
+          'User-Agent': ws.userAgent,
         },
       });
     },
