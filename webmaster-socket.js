@@ -210,15 +210,20 @@ async function handleSendMessage(json, webSocket, getChatMembers, api) {
     deviceId: webSocket.deviceId,
   };
 
-  await api.post("/messages/send", {
-    message_id: payload.message_id,
-    conversation_id: payload.conversation_id,
-    message: payload.message,
-    sender_id: payload.sender_id,
-    time: payload.time,
-    parent_id: payload.reply,
-    sentFiles: payload.files,
+  try{
+    const response = await api.post("/messages/send", {
+      message_id: payload.message_id,
+      conversation_id: payload.conversation_id,
+      message: payload.message,
+      sender_id: payload.sender_id,
+      time: payload.time,
+      parent_id: payload.reply,
+      sentFiles: payload.files,
   });
+
+  const data = await response.data()
+
+  if(!data.success) throw new Error(data.message)
 
   const members = await getChatMembers(json.conversation_id);
   if (!members) return;
@@ -228,6 +233,10 @@ async function handleSendMessage(json, webSocket, getChatMembers, api) {
 
   // Send to all connections of the admin (all admin devices)
   broadcastToAllAdmins(payload);
+  }
+  catch(error){
+    console.log(error)
+  }
 }
 
 async function handleDeliveredMessage(json, webSocket, getChatMembers, api) {
@@ -509,6 +518,7 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on ${port}, backend url: ${BACKEND_URL}`);
+
 
 
 
