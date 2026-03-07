@@ -480,6 +480,11 @@ function createApi(ws) {
     async get(url, params = {}) {
       const queryString = new URLSearchParams(params).toString();
       const urlWithParams = queryString ? `${url}?${queryString}` : url;
+      consosole.log(`${url}?${queryString}`, { headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${ws.token}`,
+          'User-Agent': ws.userAgent,
+        }})
       return await fetch(`${BACKEND_URL}${urlWithParams}`, {
         method: "GET",
         headers: {
@@ -490,6 +495,11 @@ function createApi(ws) {
       });
     },
     async post(url, payload) {
+       consosole.log(`${url}`, { headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${ws.token}`,
+          'User-Agent': ws.userAgent,
+        }}, payload)
       return await fetch(`${BACKEND_URL}${url}`, {
         method: "POST",
         body: JSON.stringify(payload),
@@ -504,3 +514,4 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on ${port}, backend url: ${BACKEND_URL}`);
+
