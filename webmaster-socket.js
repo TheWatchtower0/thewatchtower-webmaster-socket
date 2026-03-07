@@ -480,7 +480,7 @@ function createApi(ws) {
     async get(url, params = {}) {
       const queryString = new URLSearchParams(params).toString();
       const urlWithParams = queryString ? `${url}?${queryString}` : url;
-      consosole.log(`${url}?${queryString}`, { headers: {
+      console.log(`${url}?${queryString}`, { headers: {
           "Content-type": "application/json",
           Authorization: `Bearer ${ws.token}`,
           'User-Agent': ws.userAgent,
@@ -495,7 +495,7 @@ function createApi(ws) {
       });
     },
     async post(url, payload) {
-       consosole.log(`${url}`, { headers: {
+       console.log(`${url}`, { headers: {
           "Content-type": "application/json",
           Authorization: `Bearer ${ws.token}`,
           'User-Agent': ws.userAgent,
@@ -514,4 +514,5 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on ${port}, backend url: ${BACKEND_URL}`);
+
 
