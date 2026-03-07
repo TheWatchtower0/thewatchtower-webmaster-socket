@@ -36,7 +36,7 @@ webSocketSecure.on("connection", async (webSocket, request) => {
     conversationId,
     token,
     userOnWebmaster = "1",
-    userAgent
+    userAgent,
   } = url.parse(request.url, true).query;
 
   const parsedIsAdmin = isAdmin === "true";
@@ -54,8 +54,8 @@ webSocketSecure.on("connection", async (webSocket, request) => {
 
   console.log({
     url_param_user_agent: userAgent,
-    websocket_stored_user_agent: webSocket.userAgent
-  })
+    websocket_stored_user_agent: webSocket.userAgent,
+  });
 
   // Add to device connections
   if (!deviceConnections.has(deviceId)) {
@@ -145,7 +145,7 @@ setInterval(() => {
     const customWs = ws;
     if (customWs.isAlive === false) {
       console.log(
-        `Terminating dead socket for user ${customWs.userId}, device ${customWs.deviceId}`
+        `Terminating dead socket for user ${customWs.userId}, device ${customWs.deviceId}`,
       );
       removeConnection(customWs);
       return customWs.terminate();
@@ -210,20 +210,21 @@ async function handleSendMessage(json, webSocket, getChatMembers, api) {
     deviceId: webSocket.deviceId,
   };
 
-  try{
-    const response = await api.post("/messages/send", {
-      message_id: payload.message_id,
-      conversation_id: payload.conversation_id,
-      message: payload.message,
-      sender_id: payload.sender_id,
-      time: payload.time,
-      parent_id: payload.reply,
-      sentFiles: payload.files,
+  const response = await api.post("/messages/send", {
+    message_id: payload.message_id,
+    conversation_id: payload.conversation_id,
+    message: payload.message,
+    sender_id: payload.sender_id,
+    time: payload.time,
+    parent_id: payload.reply,
+    sentFiles: payload.files,
   });
 
-  const data = await response.data()
+  const data = await response.json();
 
-  if(!data.success) throw new Error(data.message)
+  console.log(data);
+
+  if (!data.success) throw new Error(data.message);
 
   const members = await getChatMembers(json.conversation_id);
   if (!members) return;
@@ -233,10 +234,6 @@ async function handleSendMessage(json, webSocket, getChatMembers, api) {
 
   // Send to all connections of the admin (all admin devices)
   broadcastToAllAdmins(payload);
-  }
-  catch(error){
-    console.log(error)
-  }
 }
 
 async function handleDeliveredMessage(json, webSocket, getChatMembers, api) {
@@ -355,8 +352,8 @@ async function handleAdminOpenChat(json, webSocket, getChatMembers, api) {
     conversation_id: payload.conversation_id,
   });
 
-  const data = await response.json()
-  console.log(webSocket.token, BACKEND_URL, data)
+  const data = await response.json();
+  console.log(webSocket.token, BACKEND_URL, data);
 
   const members = await getChatMembers(json.conversation_id);
   if (!members) return;
@@ -440,9 +437,7 @@ function createGetMembers(ws) {
       return conversationsMap.get(conversation_id);
     } else {
       try {
-        const response = await api.get(
-          `/messages/conversation/${conversation_id}`
-        );
+        const response = await api.get(`/messages/conversation/${conversation_id}`);
 
         // 1. Check if the response is actually JSON
         const contentType = response.headers.get("content-type");
@@ -499,7 +494,7 @@ function createApi(ws) {
         headers: {
           "Content-type": "application/json",
           Authorization: `Bearer ${ws.token}`,
-          'User-Agent': ws.userAgent,
+          "User-Agent": ws.userAgent,
         },
       });
     },
@@ -510,7 +505,7 @@ function createApi(ws) {
         headers: {
           "Content-type": "application/json",
           Authorization: `Bearer ${ws.token}`,
-          'User-Agent': ws.userAgent,
+          "User-Agent": ws.userAgent,
         },
       });
     },
@@ -518,8 +513,3 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on ${port}, backend url: ${BACKEND_URL}`);
-
-
-
-
-
