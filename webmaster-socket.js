@@ -52,7 +52,7 @@ webSocketSecure.on("connection", async (webSocket, request) => {
   webSocket.isAlive = true;
   webSocket.userAgent = userAgent;
 
-  cosnole.log({
+  console.log({
     url_param_user_agent: userAgent,
     websocket_stored_user_agent: webSocket.userAgent
   })
@@ -509,6 +509,7 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on ${port}, backend url: ${BACKEND_URL}`);
+
 
 
 
