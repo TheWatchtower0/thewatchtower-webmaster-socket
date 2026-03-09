@@ -7,6 +7,7 @@ const webSocketSecure = new WebSocketServer({
 });
 
 const BACKEND_URL = process.env.BACKEND_URL;
+const INTERNAL_SERVICE_KEY = process.env.INTERNAL_SERVICE_KEY;
 
 /**
  * @type {Map<string, Set<WebSocket>>} - userId to set of WebSocket connections
@@ -52,9 +53,16 @@ webSocketSecure.on("connection", async (webSocket, request) => {
   webSocket.isAlive = true;
   webSocket.userAgent = userAgent;
 
+  // Capture real client IP for logging/device context
+  webSocket.clientIP =
+    request.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+    request.headers["cf-connecting-ip"] ||
+    request.socket.remoteAddress;
+
   console.log({
     url_param_user_agent: userAgent,
     websocket_stored_user_agent: webSocket.userAgent,
+    client_ip: webSocket.clientIP,
   });
 
   // Add to device connections
@@ -210,7 +218,7 @@ async function handleSendMessage(json, webSocket, getChatMembers, api) {
     deviceId: webSocket.deviceId,
   };
 
-  const response = await api.post("/messages/send", {
+  await api.post("/messages/send", {
     message_id: payload.message_id,
     conversation_id: payload.conversation_id,
     message: payload.message,
@@ -219,12 +227,6 @@ async function handleSendMessage(json, webSocket, getChatMembers, api) {
     parent_id: payload.reply,
     sentFiles: payload.files,
   });
-
-  const data = await response.json();
-
-  console.log(data);
-
-  if (!data.success) throw new Error(data.message);
 
   const members = await getChatMembers(json.conversation_id);
   if (!members) return;
@@ -495,6 +497,7 @@ function createApi(ws) {
           "Content-type": "application/json",
           Authorization: `Bearer ${ws.token}`,
           "User-Agent": ws.userAgent,
+          "X-Internal-Key": INTERNAL_SERVICE_KEY,
         },
       });
     },
@@ -506,6 +509,7 @@ function createApi(ws) {
           "Content-type": "application/json",
           Authorization: `Bearer ${ws.token}`,
           "User-Agent": ws.userAgent,
+          "X-Internal-Key": INTERNAL_SERVICE_KEY,
         },
       });
     },
