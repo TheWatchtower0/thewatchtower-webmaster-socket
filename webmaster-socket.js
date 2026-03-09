@@ -53,18 +53,6 @@ webSocketSecure.on("connection", async (webSocket, request) => {
   webSocket.isAlive = true;
   webSocket.userAgent = userAgent;
 
-  // Capture real client IP for logging/device context
-  webSocket.clientIP =
-    request.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
-    request.headers["cf-connecting-ip"] ||
-    request.socket.remoteAddress;
-
-  console.log({
-    url_param_user_agent: userAgent,
-    websocket_stored_user_agent: webSocket.userAgent,
-    client_ip: webSocket.clientIP,
-  });
-
   // Add to device connections
   if (!deviceConnections.has(deviceId)) {
     deviceConnections.set(deviceId, new Set());
@@ -517,3 +505,4 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on ${port}, backend url: ${BACKEND_URL}`);
+
