@@ -490,6 +490,7 @@ function createApi(ws) {
       });
     },
     async post(url, payload) {
+      console.log(`Bearer ${ws.token}`, 'Bearer token')
       return await fetch(`${BACKEND_URL}${url}`, {
         method: "POST",
         body: JSON.stringify(payload),
@@ -505,4 +506,5 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on ${port}, backend url: ${BACKEND_URL}`);
+
 
