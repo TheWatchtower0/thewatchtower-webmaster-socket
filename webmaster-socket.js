@@ -490,7 +490,12 @@ function createApi(ws) {
       });
     },
     async post(url, payload) {
-      console.log(`Bearer ${ws.token}`, 'Bearer token')
+      console.log({
+          "Content-type": "application/json",
+          Authorization: `Bearer ${ws.token}`,
+          "User-Agent": ws.userAgent,
+          "X-Internal-Key": INTERNAL_SERVICE_KEY,
+        }, 'header')
       return await fetch(`${BACKEND_URL}${url}`, {
         method: "POST",
         body: JSON.stringify(payload),
@@ -506,5 +511,6 @@ function createApi(ws) {
 }
 
 console.log(`WebSocket server is running on ${port}, backend url: ${BACKEND_URL}`);
+
 
 
